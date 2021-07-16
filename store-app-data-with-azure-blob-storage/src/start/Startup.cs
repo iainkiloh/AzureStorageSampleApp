@@ -5,6 +5,7 @@ using Microsoft.Extensions.DependencyInjection;
 using FileUploader.Models;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Hosting;
+using System;
 
 namespace FileUploader
 {
@@ -22,6 +23,9 @@ namespace FileUploader
             // Set up IOptions and populate AzureStorageConfig from configuration
             services.AddOptions();
             services.Configure<AzureStorageConfig>(Configuration.GetSection("AzureStorageConfig"));
+
+            var conn = Configuration["AzureStorageConfig:ConnectionString"];
+            var containername = Configuration["AzureStorageConfig:FileContainerName"];
 
             // Wire up a single instance of BlobStorage, calling Initialize() when we first use it.
             services.AddSingleton<IStorage>(serviceProvider => {
@@ -54,6 +58,13 @@ namespace FileUploader
                 routes.MapDefaultControllerRoute();
                 routes.MapControllers();
             });
+
+            var message = $"Host: {Environment.MachineName}\n" +
+                    $"EnvironmentName: {env.EnvironmentName}\n" +
+                    $"Secret value: {Configuration["AzureStorageConfig:ConnectionString"]}";
+
+            Console.WriteLine(message);
+
         }
     }
 }

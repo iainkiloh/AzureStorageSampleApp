@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azblobuploader
+  labels:
+    app: azblobuploader
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: azblobuploader
+  template:
+    metadata:
+      labels:
+        app: azblobuploader
+    spec:
+      containers:
+      - name: azblobuploader
+        image: iainkiloh/azblobuploader:v4
+        ports:
+        - containerPort: 80
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Release"
+        volumeMounts:
+        - name: secrets
+          mountPath: /app/secrets
+          readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: azblobuploadersecrets

@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: azblobuploader
+spec:
+  replicas: 1
+  namespace: netcore
+  selector:
+    matchLabels:
+      app: azblobuploader
+  template:
+    metadata:
+      labels:
+        app: azblobuploader
+    spec:
+      containers:
+      - name: azblobuploaderapp
+        image: iainkiloh/azblobuploader:v3
+        ports:
+        - containerPort: 80
+        env:
+        - name: "ASPNETCORE_ENVIRONMENT"
+          value: "Kubernetes"
+        volumeMounts:
+        - name: secrets
+          mountPath: /app
+          readOnly: true
+      volumes:
+      - name: secrets
+        secret:
+          secretName: azblobuploadersecrets
